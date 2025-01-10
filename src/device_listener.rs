@@ -26,17 +26,17 @@ impl DeviceListener {
 
     pub fn listen(&mut self) {
         loop {
-            sleep(Duration::from_secs(3));
             let devices = &self.list_devices();
             let to_connect: Vec<&String> = devices.into_iter().filter(|d| !self.connected_devices.contains(d)).collect();
             if to_connect.len() == 0 {
                 continue;
             }
-
+            
             info!("Found {} new device(s)!", to_connect.len());
             for device in devices {
                 let _ = &self.connect_device(device);
             }
+            sleep(Duration::from_secs(3));
         }
     }
 
