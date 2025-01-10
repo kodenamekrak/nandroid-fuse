@@ -5,8 +5,6 @@ WIP Linux port of [lauriethefish/nandroidfs](https://github.com/Lauriethefish/na
 ```bash
 git clone https://github.com/kodenamekrak/nandroid-fuse
 git submodule update --init
-# fixes incorrect capitalisation in daemon build file
-sed -i 's/Nandroid/nandroid/' ./nandroidfs/nandroid_daemon/Android.mk
 ```
 
 ## Building
