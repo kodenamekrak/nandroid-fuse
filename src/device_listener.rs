@@ -1,11 +1,11 @@
 use crate::adb::Adb;
 
-use std::default;
 use std::thread::sleep;
 use std::time::Duration;
 
+use std::io;
+
 use tracing::info;
-use tracing::debug;
 
 pub struct DeviceListener {
     adb: Adb,
@@ -24,18 +24,23 @@ impl DeviceListener {
         self.adb.setup()
     }
 
+    fn poll_new_devices(&mut self) -> io::Result<()> {
+        let devices = self.list_devices()?;
+
+        let to_connect: Vec<String> = devices.into_iter()
+            .filter(|d| !self.connected_devices.contains(d))
+            .collect();
+
+        for device in &to_connect {
+            self.connect_device(device);
+        }
+
+        Ok(())
+    }
+
     pub fn listen(&mut self) {
         loop {
-            let devices = &self.list_devices();
-            let to_connect: Vec<&String> = devices.into_iter().filter(|d| !self.connected_devices.contains(d)).collect();
-            if to_connect.len() == 0 {
-                continue;
-            }
-            
-            info!("Found {} new device(s)!", to_connect.len());
-            for device in devices {
-                let _ = &self.connect_device(device);
-            }
+            let _ = self.poll_new_devices();
             sleep(Duration::from_secs(3));
         }
     }
@@ -48,37 +53,25 @@ impl DeviceListener {
         // Create filesystem then mount
     }
 
-    pub fn list_devices(&self) -> Vec<String> {
-        let out = self.adb.run_command(["devices"].iter())
-            .expect("Failed to list devices!");
-        
-        let devices: Vec<String> = match String::from_utf8(out.stdout) {
-            Ok(s) => {
-                // Remove empty lines
-                let lines: Vec<String> = s
-                    .split("\n")
-                    .map(|s| s.to_string())
-                    .filter(|s| s.split_whitespace().count() > 0)
-                    .collect();
+    pub fn list_devices(&self) -> io::Result<Vec<String>> {
+        let out = self.adb.run_command(["devices"].iter())?;
 
-                lines
-                    .iter()
-                    .skip(1)
-                    // Get the device entry from each line
-                    .map(|s|
-                        s.to_string()
-                        .split_whitespace()
-                        .take(1)
-                        .collect::<Vec<&str>>()
-                        .first()
-                        .unwrap()
-                        .to_string()
-                    )
-                    .collect()
-            },
-            Err(..) => return Vec::new(),
-        };
-        
-        devices
+        String::from_utf8(out.stdout).and_then(|s| {
+            // Remove empty lines
+            Ok(s.split("\n")
+            .filter(|s| s.split_whitespace().count() > 0)
+            .skip(1)
+            // Get the device entry from each line
+            .map(|s|
+                s.to_string()
+                .split_whitespace()
+                .take(1)
+                .collect::<Vec<&str>>()
+                .first()
+                .unwrap()
+                .to_string()
+            )
+            .collect())
+        }).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))
     }
 }
