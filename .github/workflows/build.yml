@@ -19,6 +19,9 @@ jobs:
             pwsh build.ps1
             cd ${GITHUB_WORKSPACE}
 
+      - name: Install apt dependencies
+        run: sudo apt-get install fuse3 libfuse3-dev
+
       - name: cargo build
         run: cargo build
 
@@ -43,6 +46,9 @@ jobs:
             sed -i 's/c++2a/c++2a -O3/' Android.mk
             pwsh build.ps1
             cd ${GITHUB_WORKSPACE}
+
+      - name: Install apt dependencies
+        run: sudo apt-get install fuse3 libfuse3-dev
 
       - name: cargo build
         run: cargo build --release
