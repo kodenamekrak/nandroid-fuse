@@ -49,12 +49,14 @@ impl DeviceListener {
     // /etc config?
     fn connect_device(&mut self, device: &str) {
         info!("Connecting device {}", device);
+        let daemon_process = self.adb.push_and_exec_daemon(device, 28933).expect("Failed to start daemon");
+
         self.connected_devices.push(String::from(device));
         // Create filesystem then mount
     }
 
     pub fn list_devices(&self) -> io::Result<Vec<String>> {
-        let out = self.adb.run_command(["devices"].iter())?;
+        let out = self.adb.run_command(&["devices"])?;
 
         String::from_utf8(out.stdout).and_then(|s| {
             // Remove empty lines
