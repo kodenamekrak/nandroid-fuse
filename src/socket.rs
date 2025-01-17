@@ -8,7 +8,7 @@ pub struct Socket {
 }
 
 impl Socket {
-    pub fn new(address: &str, port: u16) -> io::Result<Socket> {
+    pub fn connect(address: &str, port: u16) -> io::Result<Socket> {
         let stream = TcpStream::connect(format!("{}:{}", address, port))?;
         Ok(Socket {
             stream

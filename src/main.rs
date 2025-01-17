@@ -1,5 +1,7 @@
 mod adb;
-pub mod device_listener;
+mod device_listener;
+mod connection;
+mod socket;
 
 use device_listener::DeviceListener;
 
