@@ -1,4 +1,6 @@
 use crate::adb::Adb;
+use crate::connection::Connection;
+use crate::filesystem::Filesystem;
 
 use std::thread::sleep;
 use std::time::Duration;
@@ -6,6 +8,7 @@ use std::time::Duration;
 use std::io;
 
 use tracing::info;
+use tracing::error;
 
 pub struct DeviceListener {
     adb: Adb,
@@ -32,7 +35,10 @@ impl DeviceListener {
             .collect();
 
         for device in &to_connect {
-            self.connect_device(device);
+            info!("Connecting device {}", device);
+            if let Err(e) = self.connect_device(device) {
+                error!("Failed to connect device: {}", e.to_string());
+            }
         }
 
         Ok(())
@@ -47,12 +53,17 @@ impl DeviceListener {
 
     // TODO: Add some way to set manual mountpoints
     // /etc config?
-    fn connect_device(&mut self, device: &str) {
-        info!("Connecting device {}", device);
-        let daemon_process = self.adb.push_and_exec_daemon(device, 28933).expect("Failed to start daemon");
+    fn connect_device(&mut self, device: &str) -> io::Result<()> {
+        let daemon_process = self.adb.push_and_exec_daemon(device, 28933)?;
+        //  TODO: properly increment ports when multiple devices are connected
+        let connection = Connection::connect("localhost", 28933)?;
+
+        let fs = Filesystem::new(connection, daemon_process);
+        fs.mount("./mount")?;
 
         self.connected_devices.push(String::from(device));
-        // Create filesystem then mount
+
+        Ok(())
     }
 
     pub fn list_devices(&self) -> io::Result<Vec<String>> {
