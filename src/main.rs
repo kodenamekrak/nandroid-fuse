@@ -2,6 +2,9 @@ mod adb;
 mod device_listener;
 mod connection;
 mod socket;
+mod filesystem;
+mod requests;
+mod response;
 
 use device_listener::DeviceListener;
 
