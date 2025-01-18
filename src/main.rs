@@ -5,6 +5,7 @@ mod socket;
 mod filesystem;
 mod requests;
 mod response;
+mod inode_table;
 
 use device_listener::DeviceListener;
 
