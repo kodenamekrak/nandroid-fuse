@@ -37,10 +37,10 @@ impl From<io::Error> for ResponseStatus {
 }
 
 pub struct FileStat {
-    mode: u16,
-    size: u64,
-    access_time: u64,
-    write_time: u64,
+    pub mode: u16,
+    pub size: u64,
+    pub access_time: u64,
+    pub write_time: u64,
 }
 
 pub struct DirectoryEntry {
