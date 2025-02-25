@@ -18,25 +18,25 @@ impl Socket {
     pub fn read_byte(&mut self) -> io::Result<u8> {
         let mut buf = [0u8; 1];
         self.stream.read_exact(&mut buf)?;
-        Ok(u8::from_le_bytes(buf))
+        Ok(u8::from_be_bytes(buf))
     }
 
     pub fn read_u16(&mut self) -> io::Result<u16> {
         let mut buf = [0u8; 2];
         self.stream.read_exact(&mut buf)?;
-        Ok(u16::from_le_bytes(buf))
+        Ok(u16::from_be_bytes(buf))
     }
 
     pub fn read_u32(&mut self) -> io::Result<u32> {
         let mut buf = [0u8; 4];
         self.stream.read_exact(&mut buf)?;
-        Ok(u32::from_le_bytes(buf))
+        Ok(u32::from_be_bytes(buf))
     }
 
     pub fn read_u64(&mut self) -> io::Result<u64> {
         let mut buf = [0u8; 8];
         self.stream.read_exact(&mut buf)?;
-        Ok(u64::from_le_bytes(buf))
+        Ok(u64::from_be_bytes(buf))
     }
 
     pub fn read_string(&mut self) -> io::Result<String> {
@@ -50,19 +50,19 @@ impl Socket {
     }
 
     pub fn write_byte(&mut self, data: u8) -> io::Result<()> {
-        self.stream.write_all(data.to_le_bytes().as_mut())
+        self.stream.write_all(data.to_be_bytes().as_mut())
     }
 
     pub fn write_u16(&mut self, data: u16) -> io::Result<()> {
-        self.stream.write_all(data.to_le_bytes().as_mut())
+        self.stream.write_all(data.to_be_bytes().as_mut())
     }
 
     pub fn write_u32(&mut self, data: u32) -> io::Result<()> {
-        self.stream.write_all(data.to_le_bytes().as_mut())
+        self.stream.write_all(data.to_be_bytes().as_mut())
     }
 
     pub fn write_u64(&mut self, data: u64) -> io::Result<()> {
-        self.stream.write_all(data.to_le_bytes().as_mut())
+        self.stream.write_all(data.to_be_bytes().as_mut())
     }
     
     pub fn write_string(&mut self, data: &str) -> io::Result<()> {
