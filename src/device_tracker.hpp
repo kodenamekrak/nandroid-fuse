@@ -1,8 +1,11 @@
 #pragma once
 
+#include "nandroid.hpp"
+
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace nandroid
 {
@@ -19,7 +22,7 @@ namespace nandroid
 
         void connect_device(const std::string& device);
         
-        std::vector<std::string> connected_devices;
+        std::vector<std::unique_ptr<Nandroid>> connected_devices;
         uint16_t current_port = 25989;
     };
 }

@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <atomic>
+#include <memory>
 
 namespace nandroid
 {
@@ -15,6 +16,8 @@ namespace nandroid
         ~Nandroid();
 
         void connect();
+        
+        const std::string& get_device();
 
     private:
 
@@ -25,7 +28,7 @@ namespace nandroid
         
         std::string device;
         uint16_t port;
-        Connection* connection;
+        std::unique_ptr<Connection> connection;
         std::atomic<bool> agent_ready;
         std::thread daemon_process_thread;
     };

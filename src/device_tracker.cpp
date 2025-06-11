@@ -11,7 +11,8 @@ namespace nandroid
     {
         for(const std::string& device : get_adb_devices())
         {
-            if(std::ranges::contains(connected_devices, device))
+            if(std::ranges::any_of(connected_devices, 
+               [&](const auto& p){return p->get_device() == device;}))
             {
                 continue;
             }
@@ -54,10 +55,10 @@ namespace nandroid
     {
         std::printf("Connecting device %s\n", device.c_str());
         
-        Nandroid* nandroid = new Nandroid(device, current_port);
+        std::unique_ptr nandroid = std::make_unique<Nandroid>(device, current_port);
         nandroid->connect();
         current_port++;
         
-        connected_devices.push_back(device);
+        connected_devices.emplace_back(std::move(nandroid));
     }
 }

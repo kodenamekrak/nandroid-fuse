@@ -32,7 +32,7 @@ namespace nandroid
             std::this_thread::yield();
         }
 
-        connection = new Connection("127.0.0.1", port);
+        connection = std::make_unique<Connection>("127.0.0.1", port);
 
         mount();
     }
@@ -70,5 +70,10 @@ namespace nandroid
                 agent_ready = true;
             }
         });
+    }
+
+    const std::string& Nandroid::get_device()
+    {
+        return device;
     }
 }
