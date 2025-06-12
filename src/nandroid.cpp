@@ -1,4 +1,5 @@
 #include "nandroid.hpp"
+#include "operations.hpp"
 #include "util.hpp"
 #include "logger.hpp"
 
@@ -6,6 +7,9 @@
 
 #include <format>
 #include <thread>
+#include <filesystem>
+
+#include <fuse.h>
 
 constexpr std::string_view DAEMON_LOCAL_PATH("/home/kodenamekrak/dev/C++/nandroid-fuse/nandroidfs/nandroid_daemon/libs/arm64-v8a/nandroid-daemon");
 constexpr std::string_view DAEMON_REMOTE_PATH("/data/local/tmp/nandroid-daemon");
@@ -17,7 +21,7 @@ namespace nandroid
 
     Nandroid::~Nandroid()
     {
-        daemon_process_thread.join();
+        unmount();
     }
 
     void Nandroid::connect()
@@ -25,7 +29,7 @@ namespace nandroid
         push_daemon();
 
         agent_ready = false;
-        daemon_process_thread = std::thread(std::bind(&Nandroid::invoke_daemon_thread, this));
+        daemon_process_thread = std::jthread(std::bind(&Nandroid::invoke_daemon_thread, this));
         daemon_process_thread.detach();
 
         while(!agent_ready)
@@ -59,6 +63,29 @@ namespace nandroid
     void Nandroid::mount()
     {
         Logger::info("Mounting device {}", device.c_str());
+
+        std::string mp = get_mountpoint();
+        if(!std::filesystem::exists(mp))
+        {
+            std::filesystem::create_directories(mp);
+        }
+
+        fuse_mount_thread = std::jthread([mp]() 
+        {
+            fuse_args args = FUSE_ARGS_INIT(0, nullptr);
+            fuse_opt_add_arg(&args, "nandroid");
+            fuse_opt_add_arg(&args, "-f");
+            fuse_opt_add_arg(&args, mp.c_str());
+            fuse_main(args.argc, args.argv, operations::get_operations(), nullptr);
+            fuse_opt_free_args(&args);
+        });
+        fuse_mount_thread.detach();
+    }
+
+    void Nandroid::unmount()
+    {
+        util::run_command(std::format("fusermount -u {}", get_mountpoint()));
+        std::filesystem::remove(get_mountpoint());
     }
 
     void Nandroid::invoke_daemon_thread()
@@ -76,5 +103,10 @@ namespace nandroid
     const std::string& Nandroid::get_device()
     {
         return device;
+    }
+
+    std::string Nandroid::get_mountpoint()
+    {
+        return std::format("/run/user/{}/nandroid/{}", getuid(), device);
     }
 }
