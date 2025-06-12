@@ -70,13 +70,13 @@ namespace nandroid
             std::filesystem::create_directories(mp);
         }
 
-        fuse_mount_thread = std::jthread([mp]() 
+        fuse_mount_thread = std::jthread([this, mp]() 
         {
             fuse_args args = FUSE_ARGS_INIT(0, nullptr);
             fuse_opt_add_arg(&args, "nandroid");
             fuse_opt_add_arg(&args, "-f");
             fuse_opt_add_arg(&args, mp.c_str());
-            fuse_main(args.argc, args.argv, operations::get_operations(), nullptr);
+            fuse_main(args.argc, args.argv, operations::get_operations(), this);
             fuse_opt_free_args(&args);
         });
         fuse_mount_thread.detach();
@@ -84,6 +84,7 @@ namespace nandroid
 
     void Nandroid::unmount()
     {
+        if(!std::filesystem::exists(get_mountpoint())) return;
         Logger::info("[{}] Unmounting device", device);
         util::run_command(std::format("fusermount -u {}", get_mountpoint()));
         std::filesystem::remove(get_mountpoint());
