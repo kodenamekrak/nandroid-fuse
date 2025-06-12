@@ -1,3 +1,4 @@
 [submodule "nandroidfs"]
 	path = nandroidfs
 	url = https://github.com/Lauriethefish/nandroidfs
+	ignore = dirty
