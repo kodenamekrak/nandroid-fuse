@@ -32,6 +32,8 @@ namespace nandroid
             logerr(std::format("{}: {}", "ERROR", std::format(std::forward<std::format_string<_Args...>>(fmt), std::forward<_Args>(args)...)));
         }
 
+    private:
+
         static void log(const std::string& msg);
         static void logerr(const std::string& msg);
     };
