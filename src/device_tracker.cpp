@@ -1,5 +1,6 @@
 #include "device_tracker.hpp"
 #include "util.hpp"
+#include "logger.hpp"
 
 #include <boost/process/search_path.hpp>
 
@@ -26,7 +27,7 @@ namespace nandroid
         std::string adbout;
         if(int ex = util::run_adb_command("devices", adbout); ex != 0)
         {
-            std::fprintf(stderr, "Failed to execute adb: Error code %i\n", ex);
+            Logger::error("Failed to execute adb: Error code {}", ex);
             return {};
         }
 
@@ -53,7 +54,7 @@ namespace nandroid
 
     void DeviceTracker::connect_device(const std::string& device)
     {
-        std::printf("Connecting device %s\n", device.c_str());
+        Logger::info("Connecting device {}", device.c_str());
         
         std::unique_ptr nandroid = std::make_unique<Nandroid>(device, current_port);
         nandroid->connect();

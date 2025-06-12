@@ -1,5 +1,6 @@
 #include "nandroid.hpp"
 #include "util.hpp"
+#include "logger.hpp"
 
 #include "nandroid_shared/requests.hpp"
 
@@ -57,7 +58,7 @@ namespace nandroid
 
     void Nandroid::mount()
     {
-        std::printf("Mounting device %s\n", device.c_str());
+        Logger::info("Mounting device {}", device.c_str());
     }
 
     void Nandroid::invoke_daemon_thread()
