@@ -62,7 +62,7 @@ namespace nandroid
 
     void Nandroid::mount()
     {
-        Logger::info("Mounting device {}", device.c_str());
+        Logger::info("[{}] Mounting device", device.c_str());
 
         std::string mp = get_mountpoint();
         if(!std::filesystem::exists(mp))
@@ -84,8 +84,10 @@ namespace nandroid
 
     void Nandroid::unmount()
     {
+        Logger::info("[{}] Unmounting device", device);
         util::run_command(std::format("fusermount -u {}", get_mountpoint()));
         std::filesystem::remove(get_mountpoint());
+        util::run_adb_command_with_device("shell killall nandroid-daemon", device);
     }
 
     void Nandroid::invoke_daemon_thread()
@@ -93,6 +95,7 @@ namespace nandroid
         util::run_adb_command_stream_output(std::format("-s {} shell {}", device, DAEMON_REMOTE_PATH),
         [this](const std::string& line)
         {
+            Logger::info("[{}][daemon] {}", device, line);
             if(line.starts_with(nandroidfs::AGENT_READY_MSG))
             {
                 agent_ready = true;
