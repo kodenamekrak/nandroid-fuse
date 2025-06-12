@@ -18,14 +18,7 @@ namespace nandroid
                 continue;
             }
 
-            try
-            {
-                connect_device(device);
-            }
-            catch(const std::exception& e)
-            {
-                nandroid::Logger::error("[{}] Caught exception while mounting device!\t{}", device, e.what());
-            }
+            connect_device(device);
         }
     }
 
@@ -63,10 +56,18 @@ namespace nandroid
     {
         Logger::info("[{}] Connecting device", device.c_str());
         
-        std::unique_ptr nandroid = std::make_unique<Nandroid>(device, current_port);
-        nandroid->connect();
+        try
+        {
+            std::unique_ptr nandroid = std::make_unique<Nandroid>(device, current_port);
+            nandroid->connect();
+            
+            connected_devices.emplace_back(std::move(nandroid));
+        }
+        catch(const std::exception& e)
+        {
+            nandroid::Logger::error("[{}] Caught exception while mounting device!\t{}", device, e.what());
+        }
+
         current_port++;
-        
-        connected_devices.emplace_back(std::move(nandroid));
     }
 }
