@@ -15,7 +15,7 @@ include_directories(nandroidfs)
 
 include_directories(/usr/include/fuse3)
 
-add_compile_definitions(_FILE_OFFSET_BITS=64)
+add_compile_definitions(_FILE_OFFSET_BITS=64 FUSE_USE_VERSION=31)
 
 add_executable(nandroid
     ${CPP_FILE_LIST}
