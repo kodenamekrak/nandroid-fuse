@@ -1,5 +1,7 @@
 #pragma once
 
+#include "config.hpp"
+
 #include <string>
 #include <format>
 #include <filesystem>
@@ -23,7 +25,10 @@ namespace nandroid
         template<typename... _Args>
         static inline void verbose(std::format_string<_Args...> fmt, _Args&&... args)
         {
-            log(std::format("{}: {}", "VERBOSE", std::format(std::forward<std::format_string<_Args...>>(fmt), std::forward<_Args>(args)...)));
+            if(Config::verbose())
+            {
+                log(std::format("{}: {}", "VERBOSE", std::format(std::forward<std::format_string<_Args...>>(fmt), std::forward<_Args>(args)...)));
+            }
         }
 
         template<typename... _Args>
