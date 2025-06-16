@@ -1,9 +1,11 @@
 #include "device_tracker.hpp"
 #include "logger.hpp"
+#include "config.hpp"
 
 #include <csignal>
 #include <atomic>
 #include <thread>
+#include <vector>
 
 static std::atomic<bool> quit = false;
 
@@ -14,6 +16,14 @@ void signal_handler(int sig)
 
 int main(int argc, char *argv[])
 {
+	std::vector<std::string_view> args;
+	for(auto p = argv; p != argv + argc; p++)
+	{
+		args.emplace_back(*p);
+	}
+
+	nandroid::Config::parse(args);
+
 	struct sigaction action{};
 	sigfillset(&action.sa_mask);
 	action.sa_handler = signal_handler;
