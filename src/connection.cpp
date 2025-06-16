@@ -83,4 +83,30 @@ namespace nandroid
 
         return ResponseStatus::Success;
     }
+
+    ResponseStatus Connection::req_open(const std::string& path, nandroidfs::OpenMode mode, bool read, bool write, int& out)
+    {
+        try
+        {
+            writer.write_byte((uint8_t)RequestType::OpenHandle);
+            nandroidfs::OpenHandleArgs args(path, mode, read, write);
+            args.write(writer);
+            writer.flush();
+
+            ResponseStatus status = (ResponseStatus)reader.read_byte();
+            if(status != ResponseStatus::Success)
+            {
+                return status;
+            }
+
+            out = reader.read_u32();
+        }
+        catch(const std::exception& e)
+        {
+            nandroid::Logger::error("Caught exception!\t{}", e.what());
+            return ResponseStatus::GenericFailure;
+        }
+
+        return ResponseStatus::Success;
+    }
 }
