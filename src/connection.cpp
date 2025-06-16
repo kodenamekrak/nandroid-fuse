@@ -109,4 +109,21 @@ namespace nandroid
 
         return ResponseStatus::Success;
     }
+
+    ResponseStatus Connection::req_release(int handle)
+    {
+        try
+        {
+            writer.write_byte((uint8_t)RequestType::CloseHandle);
+            writer.write_u32(handle);
+            writer.flush();
+
+            return (ResponseStatus)reader.read_byte();
+        }
+        catch(const std::exception& e)
+        {
+            nandroid::Logger::error("Caught exception!\t{}", e.what());
+            return ResponseStatus::GenericFailure;
+        }
+    }
 }

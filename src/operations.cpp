@@ -143,9 +143,25 @@ namespace nandroid::operations
         return 0;
     }
 
+    int op_release(const char* path, struct fuse_file_info* fi)
+    {
+        Logger::verbose("op_release({}, {})", path, (void*)fi);
+
+        Connection* connection = reinterpret_cast<Connection*>(fuse_get_context()->private_data);
+
+        ResponseStatus status = connection->req_release(fi->fh);
+        if(status != ResponseStatus::Success)
+        {
+            return to_unix_err(status);
+        }
+
+        return 0;
+    }
+
     static fuse_operations operations{
         .getattr = op_getattr,
         .open = op_open,
+        .release = op_release,
         .readdir = op_readdir,
         .init = op_init,
         .create = op_create,

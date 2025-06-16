@@ -23,6 +23,7 @@ namespace nandroid
         ResponseStatus req_readdir(const std::string& path, const std::function<void(const std::string&, const FileStat&)>& consume);
         ResponseStatus req_getattr(const std::string& path, FileStat& out);
         ResponseStatus req_open(const std::string& path, nandroidfs::OpenMode mode, bool read_access, bool write_access, int& out_handle);
+        ResponseStatus req_release(int handle);
     
     private:
 
