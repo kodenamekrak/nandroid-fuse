@@ -19,5 +19,7 @@ namespace nandroid::util
 
     std::vector<std::string> split_string(const std::string& str, char sep);
 
+    const std::string& get_daemon_path();
+
     const std::string& find_adb_path();
 }

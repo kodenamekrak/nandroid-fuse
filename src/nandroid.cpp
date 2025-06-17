@@ -11,7 +11,6 @@
 
 #include <fuse.h>
 
-constexpr std::string_view DAEMON_LOCAL_PATH("/home/kodenamekrak/dev/C++/nandroid-fuse/nandroidfs/nandroid_daemon/libs/arm64-v8a/nandroid-daemon");
 constexpr std::string_view DAEMON_REMOTE_PATH("/data/local/tmp/nandroid-daemon");
 
 namespace nandroid
@@ -44,16 +43,16 @@ namespace nandroid
 
     void Nandroid::push_daemon()
     {
-        if(int ex = util::run_adb_command_with_device(std::format("push \"{}\" {}", DAEMON_LOCAL_PATH, DAEMON_REMOTE_PATH), device); ex != 0)
+        if(int ex = util::run_adb_command_with_device(std::format("push \"{}\" {}", util::get_daemon_path(), DAEMON_REMOTE_PATH), device); ex != 0)
         {
             throw std::runtime_error("Failed to push daemon to device");
         }
-
+        
         if(int ex = util::run_adb_command_with_device(std::format("shell chmod +x {}", DAEMON_REMOTE_PATH), device); ex != 0)
         {
             throw std::runtime_error("Failed to chmod daemon");
         }
-
+        
         if(int ex = util::run_adb_command_with_device(std::format("forward tcp:{} tcp:{}", port, nandroidfs::AGENT_PORT), device); ex != 0)
         {
             throw std::runtime_error("Failed to forward device port");
