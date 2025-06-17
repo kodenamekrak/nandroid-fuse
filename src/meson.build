@@ -1,0 +1,1 @@
+cpp_files = files('config.cpp', 'connection.cpp', 'device_tracker.cpp', 'logger.cpp', 'main.cpp', 'nandroid.cpp', 'operations.cpp', 'socket.cpp', 'util.cpp', 'assets.cpp')
