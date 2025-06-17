@@ -158,9 +158,26 @@ namespace nandroid::operations
         return 0;
     }
 
+    int op_read(const char* path, char* buffer, size_t size, off_t offset, struct fuse_file_info* fi)
+    {
+        Logger::verbose("op_read({}, {}, {}, {}, {})", path, (void*)buffer, size, offset, (void*)fi);
+        
+        Connection* connection = reinterpret_cast<Connection*>(fuse_get_context()->private_data);
+
+        int bytes_read = 0;
+        ResponseStatus status = connection->req_read(fi->fh, reinterpret_cast<uint8_t*>(buffer), size, offset, bytes_read);
+        if(status != ResponseStatus::Success)
+        {
+            return 0;
+        }
+
+        return bytes_read;
+    }
+
     static fuse_operations operations{
         .getattr = op_getattr,
         .open = op_open,
+        .read = op_read,
         .release = op_release,
         .readdir = op_readdir,
         .init = op_init,

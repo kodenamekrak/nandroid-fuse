@@ -126,4 +126,32 @@ namespace nandroid
             return ResponseStatus::GenericFailure;
         }
     }
+
+    ResponseStatus Connection::req_read(int handle, uint8_t* buffer, size_t size, off_t offset, int& bytes_read)
+    {
+        try
+        {
+            writer.write_byte((uint8_t)RequestType::ReadHandle);
+            nandroidfs::ReadHandleArgs args(handle, size, offset);
+            args.write(writer);
+            writer.flush();
+    
+            ResponseStatus status = (ResponseStatus)reader.read_byte();
+            if(status != ResponseStatus::Success)
+            {
+                return status;
+            }
+    
+            int read =reader.read_u32();
+            reader.read_exact(buffer, read);
+            bytes_read = read;
+        }
+        catch(const std::exception& e)
+        {
+            nandroid::Logger::error("Caught exception!\t{}", e.what());
+            return ResponseStatus::GenericFailure;
+        }
+
+        return ResponseStatus::Success;
+    }
 }
