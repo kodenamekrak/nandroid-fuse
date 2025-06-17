@@ -107,8 +107,8 @@ namespace nandroid::operations
 
         // TODO: Error on additional unsupported flags?
         int handle;
-        bool read = fi->flags & O_RDONLY;
-        bool write = fi->flags & O_WRONLY;
+        bool read = (fi->flags & O_ACCMODE) == O_RDONLY || (fi->flags & O_ACCMODE) == O_RDWR;
+        bool write = (fi->flags & O_ACCMODE) == O_WRONLY || (fi->flags & O_ACCMODE) == O_RDWR;
         OpenMode mode = to_open_mode(fi->flags);
         
         ResponseStatus status = connection->req_open(get_remote_path(path), mode, read, write, handle);
@@ -129,8 +129,8 @@ namespace nandroid::operations
 
         // TODO: pass mode somehow? chmod afterwords?
         int handle;
-        bool read = fi->flags & O_RDONLY;
-        bool write = fi->flags & O_WRONLY;
+        bool read = (fi->flags & O_ACCMODE) == O_RDONLY || (fi->flags & O_ACCMODE) == O_RDWR;
+        bool write = (fi->flags & O_ACCMODE) == O_WRONLY || (fi->flags & O_ACCMODE) == O_RDWR;
         OpenMode open_mode = to_open_mode(fi->flags);
         
         ResponseStatus status = connection->req_open(get_remote_path(path), open_mode, read, write, handle);
