@@ -174,10 +174,29 @@ namespace nandroid::operations
         return bytes_read;
     }
 
+    int op_write(const char* path, const char* buffer, size_t size, off_t offset, struct fuse_file_info* fi)
+    {
+        Logger::verbose("op_write({}, {}, {}, {}, {})", path, (void*)buffer, size, offset, (void*)fi);
+
+        Connection* connection = reinterpret_cast<Connection*>(fuse_get_context()->private_data);
+
+        ResponseStatus status = connection->req_write(fi->fh, (uint8_t*)buffer, size, offset);
+        if(status != ResponseStatus::Success)
+        {
+            return -1;
+        }
+
+        // This is probably technically UB
+        // But the daemon doesnt report how much was written
+        // So we just assume no error means everything was written
+        return size;
+    }
+
     static fuse_operations operations{
         .getattr = op_getattr,
         .open = op_open,
         .read = op_read,
+        .write = op_write,
         .release = op_release,
         .readdir = op_readdir,
         .init = op_init,

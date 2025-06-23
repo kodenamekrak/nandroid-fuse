@@ -25,6 +25,7 @@ namespace nandroid
         ResponseStatus req_open(const std::string& path, nandroidfs::OpenMode mode, bool read_access, bool write_access, int& out_handle);
         ResponseStatus req_release(int handle);
         ResponseStatus req_read(int handle, uint8_t* buffer, size_t size, off_t offset, int& bytes_read);
+        ResponseStatus req_write(int handle, uint8_t* buffer, size_t size, off_t offset);
 
     private:
 
