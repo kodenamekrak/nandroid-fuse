@@ -69,14 +69,15 @@ namespace nandroid
             std::filesystem::create_directories(mp);
         }
 
-        fuse_mount_thread = std::jthread([this, mp]() 
+        fuse_args args = FUSE_ARGS_INIT(0, nullptr);
+        fuse_opt_add_arg(&args, "nandroid");
+        fuse_context = fuse_new(&args, operations::get_operations(), sizeof(*operations::get_operations()), connection.get());
+        fuse_opt_free_args(&args);
+        fuse_mount(fuse_context, mp.c_str());
+
+        fuse_mount_thread = std::jthread([fuse_context = this->fuse_context]() 
         {
-            fuse_args args = FUSE_ARGS_INIT(0, nullptr);
-            fuse_opt_add_arg(&args, "nandroid");
-            fuse_opt_add_arg(&args, "-f");
-            fuse_opt_add_arg(&args, mp.c_str());
-            fuse_main(args.argc, args.argv, operations::get_operations(), connection.get());
-            fuse_opt_free_args(&args);
+            fuse_loop(fuse_context);
         });
         fuse_mount_thread.detach();
     }
@@ -84,8 +85,12 @@ namespace nandroid
     void Nandroid::unmount()
     {
         Logger::info("[{}] Unmounting device", device);
-        util::run_command(std::format("fusermount -u {}", get_mountpoint()));
-        std::filesystem::remove(get_mountpoint());
+        if(fuse_context)
+        {
+            fuse_unmount(fuse_context);
+            fuse_context = nullptr;
+            std::filesystem::remove(get_mountpoint());
+        }
         util::run_adb_command_with_device("shell killall nandroid-daemon", device);
     }
 

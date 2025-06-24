@@ -6,6 +6,8 @@
 #include <atomic>
 #include <memory>
 
+struct fuse;
+
 namespace nandroid
 {
     class Nandroid
@@ -30,6 +32,7 @@ namespace nandroid
         
         std::string device;
         uint16_t port;
+        fuse* fuse_context;
         std::unique_ptr<Connection> connection;
         std::atomic<bool> agent_ready;
         std::jthread daemon_process_thread;
