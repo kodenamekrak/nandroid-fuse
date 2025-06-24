@@ -16,6 +16,7 @@ namespace nandroid
         DeviceTracker() = default;
 
         void update_connected_devices();
+        void disconnect_all();
         std::vector<std::string> get_adb_devices() const;
         
     private:

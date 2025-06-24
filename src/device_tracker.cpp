@@ -70,4 +70,10 @@ namespace nandroid
 
         current_port++;
     }
+
+    void DeviceTracker::disconnect_all()
+    {
+        // Destructors will unmount the devices
+        connected_devices.clear();
+    }
 }
