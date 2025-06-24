@@ -77,6 +77,7 @@ namespace nandroid
 
         fuse_mount_thread = std::jthread([fuse_context = this->fuse_context]() 
         {
+            fuse_daemonize(1);
             fuse_loop(fuse_context);
         });
         fuse_mount_thread.detach();
