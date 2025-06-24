@@ -32,7 +32,7 @@ namespace nandroid
         
         std::string device;
         uint16_t port;
-        fuse* fuse_context;
+        fuse* fuse_context = nullptr;
         std::unique_ptr<Connection> connection;
         std::atomic<bool> agent_ready;
         std::jthread daemon_process_thread;
