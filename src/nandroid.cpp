@@ -9,7 +9,6 @@
 
 #include <cerrno>
 #include <format>
-#include <print>
 #include <stdexcept>
 #include <string>
 #include <system_error>
@@ -72,8 +71,7 @@ namespace nandroid
         {
             throw std::runtime_error("Failed to forward device port");
         }
-        std::println("Forwarding host port {} to remote port {}", port, nandroidfs::AGENT_PORT);
-        std::println("Pushed daemon to device");
+        Logger::info("[{}] Forwarded host port {} to remote port {}", device, port, nandroidfs::AGENT_PORT);
     }
 
     void Nandroid::mount()
