@@ -19,6 +19,9 @@ namespace nandroid
     public:
         
         Connection(const std::string& address, uint16_t port);
+        ~Connection();
+
+        void close();
 
         ResponseStatus req_readdir(const std::string& path, const std::function<void(const std::string&, const FileStat&)>& consume);
         ResponseStatus req_getattr(const std::string& path, FileStat& out);
@@ -31,8 +34,8 @@ namespace nandroid
 
         void perform_handshake();
 
+        Socket socket;
         nandroidfs::DataReader reader;
         nandroidfs::DataWriter writer;
-        Socket socket;
     };
 }

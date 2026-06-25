@@ -13,6 +13,11 @@ namespace nandroid
         perform_handshake();
     }
 
+    Connection::~Connection()
+    {
+        socket.close();
+    }
+
     void Connection::perform_handshake()
     {
         writer.write_u32(HANDSHAKE_DATA);
@@ -23,6 +28,11 @@ namespace nandroid
         {
             throw std::runtime_error(std::format("Handshake failed (expected {:X}, received {:X})", HANDSHAKE_DATA, received_data));
         }
+    }
+
+    void Connection::close()
+    {
+        socket.close();
     }
 
     ResponseStatus Connection::req_readdir(const std::string& path, const std::function<void(const std::string&, const nandroidfs::FileStat&)>& consume)

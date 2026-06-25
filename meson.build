@@ -18,11 +18,10 @@ nandroid_daemon_target = custom_target('nandroid-daemon',
 )
 
 fuse_dep = dependency('fuse3')
-boost_dep = dependency('boost', modules: ['filesystem'])
 
 subdir('src')
 executable('nandroid', 
     sources: [cpp_files, nandroid_daemon_target],
     cpp_args: ['-std=c++23', '-D_FILE_OFFSET_BITS=64', '-DFUSE_USE_VERSION=31'],
-    dependencies: [nandroid_shared_dep, fuse_dep, boost_dep,],
+    dependencies: [nandroid_shared_dep, fuse_dep,],
 )

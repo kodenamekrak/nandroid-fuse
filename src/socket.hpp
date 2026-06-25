@@ -12,6 +12,7 @@ namespace nandroid
         
         ~Socket();
     
+        void close();
         int read(uint8_t* buffer, int length) override;
         void write(const uint8_t* buffer, int length) override;
 

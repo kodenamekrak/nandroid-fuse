@@ -1,6 +1,7 @@
 #include "device_tracker.hpp"
 #include "logger.hpp"
 #include "config.hpp"
+#include "adb.hpp"
 
 #include <csignal>
 #include <thread>
@@ -19,6 +20,8 @@ void signal_handler(int sig)
 
 int main(int argc, char *argv[])
 {
+	adb::locate_adb_executable();
+
 	std::vector<std::string_view> args;
 	for(auto p = argv; p != argv + argc; p++)
 	{

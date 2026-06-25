@@ -1,5 +1,6 @@
 #include "socket.hpp"
 
+#include <print>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -12,7 +13,7 @@
 
 namespace nandroid
 {
-    Socket::Socket(const std::string& address, uint16_t port): address(address), port(port)
+    Socket::Socket(const std::string& address, uint16_t port): socket_descriptor(-1), address(address), port(port)
     {
         sockaddr_in socket_address;
         socket_address.sin_family = AF_INET;
@@ -28,7 +29,16 @@ namespace nandroid
 
     Socket::~Socket()
     {
-        close(socket_descriptor);
+        close();
+    }
+
+    void Socket::close()
+    {
+        if(socket_descriptor != -1)
+        {
+            ::close(socket_descriptor);
+            socket_descriptor = -1;
+        }
     }
 
     int Socket::read(uint8_t* buffer, int length)
