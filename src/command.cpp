@@ -1,9 +1,9 @@
 #include "command.hpp"
-
+#include "logger.hpp"
 #include "unistd.h"
+
 #include <cstdio>
 #include <cstring>
-#include <print>
 #include <stdexcept>
 #include <string>
 #include <sys/wait.h>
@@ -64,6 +64,7 @@ namespace nandroid::command
         }
 
         int exit_code = WEXITSTATUS(status);
+        Logger::verbose("Recieved exit code {} from command {} {}", exit_code, executable_path, parameters);
         return exit_code;
     }
 
