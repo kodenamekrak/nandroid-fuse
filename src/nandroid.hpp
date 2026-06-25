@@ -21,10 +21,12 @@ namespace nandroid
         
         const std::string& get_device();
         std::string get_mountpoint();
+        bool get_is_mounted();
 
     private:
 
         void push_daemon();
+        void disconnect();
         void mount();
         void unmount();
 

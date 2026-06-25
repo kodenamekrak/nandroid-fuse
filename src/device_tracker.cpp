@@ -5,6 +5,7 @@
 #include "nandroid.hpp"
 
 #include <algorithm>
+#include <memory>
 
 namespace nandroid
 {
@@ -12,14 +13,25 @@ namespace nandroid
     {
         for(const std::string& device : adb::list_devices())
         {
-            if(std::ranges::any_of(connected_devices, 
-               [&](const auto& p){return p->get_device() == device;}))
-            {
-                continue;
-            }
+            const auto iter = std::ranges::find_if(connected_devices, 
+                [&device](std::unique_ptr<Nandroid>& connected_device)
+                {
+                    return connected_device->get_device() == device;
+                });
+
+            // if device is already mounted then ignore
+            if(iter != connected_devices.end() && iter->get()->get_is_mounted()) continue;
 
             connect_device(device);
         }
+
+        std::ignore =  std::erase_if(connected_devices, 
+            [](std::unique_ptr<Nandroid>& device)
+            {
+                bool remove = !device->get_is_mounted();
+                if(remove) Logger::info("Removing device {} as it is not mounted", device->get_device());
+                return remove;
+            });
     }
 
     void DeviceTracker::connect_device(const std::string& device)

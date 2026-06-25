@@ -49,6 +49,13 @@ namespace nandroid
         mount();
     }
 
+    void Nandroid::disconnect()
+    {
+        connection->close();
+        connection = nullptr;
+        unmount();
+    }
+
     void Nandroid::push_daemon()
     {
         if(int ex = adb::push_file(device, util::get_daemon_path(), std::string(DAEMON_REMOTE_PATH)); ex != 0)
@@ -114,7 +121,6 @@ namespace nandroid
         }
         adb::remove_forward_port(device, port);
         adb::run_shell_command(device, {
-            "shell", 
             "killall", 
             "nandroid-daemon"
         });
@@ -137,7 +143,14 @@ namespace nandroid
         );
         if(exit_code != 0)
         {
-            throw std::runtime_error("Failed to invoke daemon with exit code {}" + std::to_string(exit_code));
+            switch (exit_code) {
+                case 143: Logger::info("[{}][daemon] daemon was killed on device", device);
+                case 255: Logger::info("[{}][daemon] device was disconnected", device);
+                    // let any error cases fall into this
+                    unmount();
+                    break;
+                default: throw std::runtime_error("Failed to invoke daemon with exit code " + std::to_string(exit_code));
+            }
         }
     }
 
@@ -149,5 +162,10 @@ namespace nandroid
     std::string Nandroid::get_mountpoint()
     {
         return std::format("/run/user/{}/nandroid/{}", 1000, device);
+    }
+
+    bool Nandroid::get_is_mounted()
+    {
+        return is_mounted;
     }
 }
