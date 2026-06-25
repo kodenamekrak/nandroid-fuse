@@ -112,6 +112,7 @@ namespace nandroid
             fuse_context = nullptr;
             std::filesystem::remove(get_mountpoint());
         }
+        adb::remove_forward_port(device, port);
         adb::run_shell_command(device, {
             "shell", 
             "killall", 

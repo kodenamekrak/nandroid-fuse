@@ -90,4 +90,15 @@ namespace nandroid::adb
             "tcp:" + std::to_string(remote_port)
         });
     }
+
+    int remove_forward_port(const std::string& device, int host_port)
+    {
+        return command::run(adb_executable_path.value(), {
+            "-s",
+            device,
+            "forward",
+            "--remove",
+            "tcp:" + std::to_string(host_port),
+        });
+    }
 }

@@ -13,4 +13,5 @@ namespace nandroid::adb
     int run_shell_command_with_output(const std::string& device, std::vector<std::string> args, std::function<void(const std::string& line)> line_read_callback);
     int push_file(const std::string& device, const std::string& host_path, const std::string& remote_path);
     int forward_ports(const std::string& device, int host_port, int remote_port);
+    int remove_forward_port(const std::string& device, int host_port);
 }
